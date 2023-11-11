@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculate Y and As</title>
+    <style>
+        .container {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            width: 300px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .calculate-button {
+            background-color: #0074D9;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <H1>XYZA Calculator alpha version</H1>
+        <h1>Calculate Y and As</h1>
+        <form id="equationForm">
+            <label class="form-label" for="mu">Mu (kN·m):</label>
+            <input class="form-input" type="number" id="mu" step="any" required>
+
+            <label class="form-label" for="fc">fc (MPa):</label>
+            <input class="form-input" type="number" id="fc" step="any" required>
+
+            <label class="form-label" for "b">b (mm):</label>
+            <input class="form-input" type="number" id="b" step="any" required>
+
+            <label class="form-label" for="d">d (mm):</label>
+            <input class="form-input" type="number" id="d" step="any" required>
+
+            <label class="form-label" for="fy">fy (MPa):</label>
+            <input class="form-input" type="number" id="fy" step="any" required>
+
+            <label class="form-label" for="initialY">Initial Estimate for Y (mm - optional - default 1..........Do not enter a value smaller than 1. This will consume your device's resources ):</label>
+            <input class="form-input" type="number" id="initialY" step="any">
+
+            <button class="calculate-button" type="button" onclick="calculateYAndAs()">Calculate Y and As</button>
+        </form>
+
+        <p class="result">Approximate Value of Y (mm): <span id="resultY"></span></p>
+        <p class="result">Approximate Value of As (mm<sup>2</sup>): <span id="resultAs"></span></p>
+    </div>
+
+    <div class="container">
+        <!DOCTYPE html>
+<html>
+<head>
+    <title>Calculate and Print ASF0 Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .container h1 {
+            color: #0074D9;
+            text-align: center;
+        }
+
+        .form-label {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0074D9;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .calculate-button {
+            background-color: #0074D9;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .results-container {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .results-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .results-list-item {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function calculateResults() {
+            var ASF0 = parseFloat(document.getElementById("ASF0").value);
+            var tolerance = parseFloat(document.getElementById("tolerance").value);
+
+            var R = [8, 10, 12, 14, 16, 18, 20, 22];
+            var X = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            var CV = {};
+            var matchingResults = [];
+
+            for (var i = 0; i < R.length; i++) {
+                for (var j = 0; j < X.length; j++) {
+                    var r = R[i];
+                    var x = X[j];
+                    var area = Math.PI * Math.pow((r / 2), 2) * x;
+
+                    CV["Result" + (i * X.length + j + 1)] = area.toFixed(2);
+
+                    var cvValue = parseFloat(CV["Result" + (i * X.length + j + 1)]);
+                    if (Math.abs(ASF0 - cvValue) <= tolerance) {
+                        matchingResults.push({ R: r, X: x, CV: cvValue });
+                    }
+                }
+            }
+
+            var resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+
+            if (matchingResults.length === 0) {
+                resultsContainer.textContent = "No matching results found.";
+            } else {
+                var resultsList = document.createElement("ul");
+                resultsList.className = "results-list";
+
+                for (var i = 0; i < matchingResults.length; i++) {
+                    var resultItem = document.createElement("li");
+                    resultItem.className = "results-list-item";
+                    resultItem.textContent = "R=" + matchingResults[i].R + ", X=" + matchingResults[i].X + ", CV=" + matchingResults[i].CV.toFixed(2);
+                    resultsList.appendChild(resultItem);
+                }
+
+                resultsContainer.appendChild(resultsList);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculate and Print ASF0 Results</h1>
+        <label for="ASF0" class="form-label">Enter ASF0:</label>
+        <input type="number" id="ASF0" class="form-input" step="any">
+
+        <label for="tolerance" class="form-label">Tolerance:</label>
+        <input type="number" id="tolerance" class="form-input" step="any">
+
+        <div class="button-container">
+            <button class="calculate-button" onclick="calculateResults()">Calculate and Print Results</button>
+            <H1>The site may contain errors. Try to check the values... All love, XYZA</H1>
+        </div>
+    </div>
+
+    <div class="results-container" id="results"></div>
+</body>
+</html>
+
+    </div>
+
+    <script>
+        function calculateYAndAs() {
+            var mu = parseFloat(document.getElementById("mu").value);
+            var fc = parseFloat(document.getElementById("fc").value);
+            var b = parseFloat(document.getElementById("b").value);
+            var d = parseFloat(document.getElementById("d").value);
+            var fy = parseFloat(document.getElementById("fy").value);
+            var initialY = parseFloat(document.getElementById("initialY").value) || 1; // Optional initial estimate with a default of 1
+
+            var tolerance = 1e-6; // Tolerance
+            var currentY = initialY;
+
+            while (true) {
+                var nextY = calculateNextY(currentY, mu, fc, b, d);
+                var difference = Math.abs(nextY - currentY);
+
+                if (difference < tolerance) {
+                    break;
+                }
+
+                currentY = nextY;
+            }
+
+            var resultYElement = document.getElementById("resultY");
+            resultYElement.textContent = " " + currentY.toFixed(2);
+
+            var as = (0.85 * fc * currentY * b) / fy;
+
+            var resultAsElement = document.getElementById("resultAs");
+            resultAsElement.textContent = " " + as.toFixed(2);
+        }
+
+        function calculateNextY(previousY, mu, fc, b, d) {
+            return (mu * 1e6) / (0.9 * 0.85 * fc * b * (d - 0.5 * previousY));
+        }
+        function calculateYAndAs() {
+    var mu = parseFloat(document.getElementById("mu").value);
+    var fc = parseFloat(document.getElementById("fc").value);
+    var b = parseFloat(document.getElementById("b").value);
+    var d = parseFloat(document.getElementById("d").value);
+    var fy = parseFloat(document.getElementById("fy").value);
+    var initialY = parseFloat(document.getElementById("initialY").value) || 1; // Optional initial estimate with a default of 1
+
+    if (isNaN(mu) || isNaN(fc) || isNaN(b) || isNaN(d) || isNaN(fy)) {
+        alert("الرجاء إدخال جميع القيم المطلوبة.");
+        return;
+    }
+
+    var tolerance = 1e-6; // Tolerance
+    var currentY = initialY;
+
+    while (true) {
+        var nextY = calculateNextY(currentY, mu, fc, b, d);
+        var difference = Math.abs(nextY - currentY);
+
+        if (difference < tolerance) {
+            break;
+        }
+
+        currentY = nextY;
+    }
+
+    var resultYElement = document.getElementById("resultY");
+    resultYElement.textContent = " " + currentY.toFixed(2);
+
+    var as = (0.85 * fc * currentY * b) / fy;
+
+    var resultAsElement = document.getElementById("resultAs");
+    resultAsElement.textContent = " " + as.toFixed(2);
+}
+
+    </script>
+    
+</body>
+</html>
